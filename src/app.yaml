@@ -1,0 +1,52 @@
+app:
+  screen_width: 800
+  screen_height: 600
+  config:
+    default_project_name: "yolo-project"
+    default_infer_project_name: "runs/detect"
+    output_update_interval: 100       # in milliseconds
+    live_data_update_interval: 1000   # in milliseconds
+    gpu_monitor_interval: 2000        # in milliseconds
+    icon_size: (20, 20)
+    separator_height: 2
+    pad_x: 10
+    pad_y: 5
+    pad_y_section: (10, 5)
+    infer_output_display_size: (640, 480)
+  slider:
+    steps: 3
+    mode: None
+  pipeline:
+    training:
+      default_data_path: "data/dataset.yaml"
+      default_epochs: 50
+      default_batch_size: 16
+      default_img_size: 640
+    inference:
+      default_confidence_threshold: 0.25
+      default_iou_threshold: 0.45
+      default_max_detections: 100
+  color_scheme:
+    red: "#FF0000"              # Error/Alert
+    orange: "#FFA500"           # Warnings/Processing/Stopping Training
+    sky-blue: "#2196F3"         # Training Model
+    green: "#00FF00"            # Training Success/Completed
+    black: "#000000"
+    darker-gray: "#505050"
+    medium-gray: "#808080"
+    light-gray: "#B1ABAB"
+    white: "#FFFFFF"
+  resources:
+    paths:
+      models: "models/"
+      datasets: "data/"
+      outputs: "outputs/"
+    camera_feed:
+      cam_idx: 1
+      URL: "localhost"
+      port: 8080
+      fps: 60
+      imgtk:
+        width: 200
+        height: 150
+      

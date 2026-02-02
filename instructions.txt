@@ -1,0 +1,12 @@
+# Step 0: Install Python3.11 with its Virtual Environment
+pip install python3.11-venv
+
+# Step 1: Activate Python3.11 Virtual Environment
+.\src\app_env\Scripts\Activate.ps1 
+
+# Step 2: Install all relevant libraries in the Environment
+pip install -r src\requirements.txt
+
+# Step 3: Run the Python Script in the Environment
+cd src
+python main.py
