@@ -1,0 +1,55 @@
+        # App Frame Configuration
+        self.grid_rowconfigure(0, weight=0)     # Header Frame 
+        self.grid_rowconfigure(1, weight=1)     # Main Menu Frame (Heading and Buttons)
+        self.grid_rowconfigure(2, weight=1)     # Table Frame (With Scrollbar)
+        self.grid_columnconfigure(0, weight=1)  # All Frames in a Single Column       
+        
+        
+        # App Header Frame
+        self.header_frame = ctk.CTkFrame(self, width=SCREEN_STRETCHED)
+        self.header_frame.grid(row=0, column=0, padx=PX, pady=(PY, 5), sticky="ew")    
+        self.header = ctk.CTkLabel(self.header_frame, text="CV Trainer App", font=ctk.CTkFont(size=28, weight="bold"))
+        self.header.pack(pady=(12,10)) 
+        
+        
+        # Main Menu Frame (With Project Management Buttons)
+        
+        self.main_menu_frame = ctk.CTkFrame(self, width=SCREEN_STRETCHED)
+        self.main_menu_frame.grid(row=1, column=0, padx=PX, pady=PY, sticky="ew")
+        self.main_menu_frame.grid_columnconfigure(0, weight=1)
+        self.main_menu_frame.grid_columnconfigure(1, weight=1)
+        
+        # Left Container: Heading
+        self.header = ctk.CTkLabel(self.main_menu_frame, text="Main Menu", font=ctk.CTkFont(size=20, weight="bold"))
+        self.header.grid(row=0, column=0, padx=(10,20), pady=8, sticky="w")
+        
+        # Left Container: Heading
+        self.btns_frame = ctk.CTkFrame(self.main_menu_frame)
+        self.btns_frame.grid(row=1, column=1, padx=SX, pady=SY, sticky="e")
+        
+        btn_kwargs = {
+            "fg_color": BTN_COLOR,
+            "text_color": "#ffffff",
+            "hover_color": "#1976D2",
+            "width": 110,
+            "corner_radius": 8
+        }
+        
+        self.edit_btn = ctk.CTkButton(self.btns_frame, **btn_kwargs, text="Edit Project", command=self.edit_project)  
+        self.edit_btn.grid(row=0, column=0, padx=(8,0), sticky="e")
+        self.add_btn = ctk.CTkButton(self.btns_frame, **btn_kwargs, text="Add Project", command=self.add_project)  
+        self.add_btn.grid(row=0, column=1, padx=8, sticky="e")
+        self.open_project_btn = ctk.CTkButton(self.btns_frame, **btn_kwargs, text="Open Project", command=self.open_project_menu)  
+        self.open_project_btn.grid(row=0, column=2, padx=(0,8), sticky="e")
+        
+        
+        # Table Frame for enlisting all the CV Projects
+        self.table_frame = ctk.CTkScrollableFrame(self, width=SCREEN_STRETCHED, fg_color=TABLE_FG_COLOR, scrollbar_button_hover_color=TABLE_HOVER_COLOR, border_color=TABLE_BORDER_COLOR, border_width=1)
+        self.table_frame.grid(row=2, column=0, padx=PX, pady=(4,PY), sticky="nsew")
+        self.empty_label = ctk.CTkLabel(
+            self.table_frame,
+            text="No projects yet.\nClick 'Add Project' to get started.",
+            font=ctk.CTkFont(size=14),
+            text_color="gray"
+        )
+        self.empty_label.pack(pady=60)

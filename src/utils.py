@@ -1,8 +1,10 @@
 import os
 import re
+import pytz
 import yaml
 import logging
 import datetime
+from datetime import date, datetime
 from PIL import Image
 import customtkinter as ctk
 
@@ -12,7 +14,6 @@ ICON_SIZE = (20, 20)
 YOLO_MODELS = ["yolov8n.pt", "yolov8s.pt", "yolov8m.pt", "yolov8l.pt", "yolov8x.pt"]
 VIDEO_EXTENSIONS = ['.mp4', '.avi', '.mov', '.mkv', '.wmv', '.flv', '.webm']
 IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.bmp', '.webp', '.tif', '.tiff']
-
 
 # All helping Functions Enlisted
 def is_float(string):
@@ -37,8 +38,22 @@ def format_time(seconds):
     if seconds is None or seconds < 0: return "--:--:--"
     return str(datetime.timedelta(seconds=int(seconds)))
 
+def add_time_stamp():
+    # Define the date
+    date_today = date.today()
+    date_str = date_today.isoformat()
+
+    # Get the current time in the specified timezone
+    timezone = pytz.timezone('Asia/Karachi')
+    current_time_str = datetime.now(timezone).strftime("%H:%M:%S")
+
+    # Concatenating Date and Time onto TimeStamp
+    dt_stamp_msg = f" [{date_str} | {current_time_str}] "
+
+    return dt_stamp_msg
+
 def load_icon(filename, size=ICON_SIZE):
-    # Allow searching in a potential 'icons' subdirectory
+    """ Allow searching in a potential 'icons' subdirectory """
     script_dir = os.path.dirname(os.path.abspath(__file__))
     possible_paths = [
         os.path.join(script_dir, filename),
@@ -61,6 +76,19 @@ def load_icon(filename, size=ICON_SIZE):
     except Exception as e:
         logging.error(f"Error loading icon {filename} from {filepath}: {e}")
         return None
+
+def load_yaml_config(config_path):
+    """Loads a YAML configuration file and returns its contents as a dictionary."""
+    if not os.path.exists(config_path):
+        logging.warning(f"Config file not found: {config_path}")
+        return {}
+    try:
+        with open(config_path, 'r') as file:
+            config = yaml.safe_load(file)
+            return config if config else {}
+    except Exception as e:
+        logging.error(f"Error loading config file {config_path}: {e}")
+        return {}
 
 def get_source_type(filepath):
     """Determines if a file path points to an image or video."""

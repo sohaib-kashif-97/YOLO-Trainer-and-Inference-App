@@ -23,3 +23,6 @@ ultralytics==8.4.9
 psutil==5.9.6
 pyyaml==6.0.3
 requests==2.32.5
+
+# Utilities
+pytz==2025.2
