@@ -5,8 +5,8 @@ import psutil
 import logging
 import customtkinter as ctk
 from tkinter import filedialog, messagebox  # for future image loading extensions
-# from src.view.ProjectMenu import ProjectMenu  # Assuming this exists for project handling
-from utils import load_yaml_config, add_time_stamp
+from view.ProjectMenu import ProjectWindow  # Assuming this exists for project handling
+from utils import load_yaml_config, save_projects_in_json, set_status_in_json, add_time_stamp
 
 # Load configuration from YAML + Set all Global Variables
 yaml_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'app.yaml')
@@ -27,6 +27,10 @@ SCREEN_STRETCHED = SCREEN_WIDTH - SCREEN_PADDING[0]
 
 """APP MAIN CLASS"""
 class App(ctk.CTk):
+
+    """
+    MAIN MENU CONSTRUCTOR
+    """
     def __init__(self):
         super().__init__()
         self.title("CV Trainer App for YOLO Models")
@@ -48,13 +52,15 @@ class App(ctk.CTk):
         self.proj_entry_template = {
             'idx': 0,
             'name': '',
-            'path': ''
+            'path': '',
+            'status': 'closed'
         }
         self.projects = []           # now list of dicts
         self.load_projects()         # will load list of dicts
 
         # Create all Widgets for the Main Menu
         self.create_main_menu_widgets()
+
 
     """
     WIDGET LAYOUT MENTIONED IN THE MAIN MENU
@@ -113,48 +119,6 @@ class App(ctk.CTk):
     """
     ALL BUTTON COMMAND FUNCTIONS BELOW
     """
-    def load_projects(self):
-        if os.path.exists(self.projects_json):
-            try:
-                with open(self.projects_json, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-                
-                # Filter only projects whose folder still exists
-                valid_projects = []
-                for entry in data:
-                    if isinstance(entry, dict) and 'path' in entry:
-                        if os.path.exists(entry['path']):
-                            valid_projects.append(entry)
-                
-                self.projects = valid_projects
-                
-                # Re-number indices if you want (optional)
-                for i, proj in enumerate(self.projects, 1):
-                    proj['idx'] = i
-                
-                if len(valid_projects) != len(data):
-                    self.save_projects_in_json()   # clean up removed projects
-                
-            except Exception as e:
-                print(f"Error loading projects.json: {e}")
-                self.projects = []
-        else:
-            self.projects = []
-            
-        # DEBUG: Do projects exist yet?    
-        print(self.projects)
-
-
-    def save_projects_in_json(self):
-        try:
-            # Sort by idx before saving (optional)
-            sorted_projects = sorted(self.projects, key=lambda x: x.get('idx', 0))
-            with open(self.projects_json, 'w', encoding='utf-8') as f:
-                json.dump(sorted_projects, f, indent=4)
-        except Exception as e:
-            print(f"Error saving projects.json: {e}")
-
-
     def add_project(self):
         stamp = add_time_stamp()
         print(f"Add Project button clicked --- {stamp}")
@@ -179,7 +143,7 @@ class App(ctk.CTk):
         
         # Create new Project
         try:
-            print("try")
+            
             # Create new project directory with sub-folders
             os.makedirs(project_path, exist_ok=False)
             os.makedirs(os.path.join(project_path, "images"), exist_ok=True)
@@ -201,8 +165,9 @@ class App(ctk.CTk):
             new_entry['idx']  = len(self.projects) + 1
             new_entry['name'] = project_name
             new_entry['path'] = project_path
+            new_entry['status'] = 'closed'
             self.projects.append(new_entry)
-            self.save_projects_in_json()
+            save_projects_in_json(self.projects, self.projects_json)
 
             # Display Refreshed Project List
             self.refresh_projects()
@@ -220,8 +185,8 @@ class App(ctk.CTk):
         for widget in self.table_frame.winfo_children():
             widget.destroy()
             
+        # Create a Placeholder when empty
         if not self.projects:
-             # Create a Placeholder when empty
             self.empty_label = ctk.CTkLabel(
                 self.table_frame,
                 text="No projects yet.\nClick «Add Project» to begin.",
@@ -240,12 +205,13 @@ class App(ctk.CTk):
         name = project_dict.get('name', 'Unnamed')
         path = project_dict.get('path', '')
         idx  = project_dict.get('idx', '?')
+        status = project_dict.get('status')
         
         # Create card with three columns: Sr. Number, Project Folder Name, Project Path, and Button to open the Project.
         card_frame = ctk.CTkFrame(self.table_frame, corner_radius=10, fg_color="#2B2B2B", border_width=1, border_color="#404040")
         card_frame.pack(pady=6, padx=12, fill="x")
-        ctk.CTkLabel(card_frame, text=f"#{idx}  {name}", font=ctk.CTkFont(size=18, weight="bold")).pack(anchor="w")
-        ctk.CTkLabel(card_frame, text=path,text_color="gray60",font=ctk.CTkFont(size=12)).pack(anchor="w", pady=(2, 0))
+        ctk.CTkLabel(card_frame, text=f"#{idx}  {name}", font=ctk.CTkFont(size=18, weight="bold")).pack(anchor="w", padx=4)
+        ctk.CTkLabel(card_frame, text=f"Path: {path}",text_color="gray60",font=ctk.CTkFont(size=12)).pack(anchor="w", padx=4, pady=(2, 0))
         
         # Action Buttons for every Project
         btn_frame = ctk.CTkFrame(card_frame, fg_color="transparent")
@@ -258,20 +224,64 @@ class App(ctk.CTk):
             "height": 32,
             "corner_radius": 8
         }
-        ctk.CTkButton(btn_frame, text="Open", command=lambda p=path: self.open_project(p), **action_btn_kwargs).pack(side="right", padx=(6, 0))
+        ctk.CTkButton(btn_frame, text="Open", command=lambda p=path, s=status: self.open_project(p,s), **action_btn_kwargs).pack(side="right", padx=(6, 0))
         ctk.CTkButton(btn_frame, text="Edit", command=lambda p=path: self.edit_project(p), **action_btn_kwargs).pack(side="right", padx=6)
+
+
+    # def save_projects_in_json(self):
+    #     try:
+    #         # Sort by idx before saving (optional)
+    #         sorted_projects = sorted(self.projects, key=lambda x: x.get('idx', 0))
+    #         with open(self.projects_json, 'w', encoding='utf-8') as f:
+    #             json.dump(sorted_projects, f, indent=4)
+    #     except Exception as e:
+    #         print(f"Error saving projects.json: {e}")
 
 
     def refresh_projects(self):
         self.load_projects()
         print(f"Projects refreshed — found {len(self.projects)} projects")
+        
+        
+    # def load_projects(self):
+    #     if os.path.exists(self.projects_json):
+    #         try:
+    #             with open(self.projects_json, 'r', encoding='utf-8') as f:
+    #                 data = json.load(f)
+                
+    #             # Filter only projects whose folder still exists
+    #             valid_projects = []
+    #             for entry in data:
+    #                 if isinstance(entry, dict) and 'path' in entry:
+    #                     if os.path.exists(entry['path']):
+    #                         valid_projects.append(entry)
+                
+    #             self.projects = valid_projects
+                
+    #             # Re-number indices if you want (optional)
+    #             for i, proj in enumerate(self.projects, 1):
+    #                 proj['idx'] = i
+                
+    #             if len(valid_projects) != len(data):
+    #                 self.save_projects_in_json()   # clean up removed projects
+                
+    #         except Exception as e:
+    #             print(f"Error loading projects.json: {e}")
+    #             self.projects = []
+    #     else:
+    #         self.projects = []
 
  
-    def open_project(self, project_path):
+    def open_project(self, project_path, status):
+        stamp = add_time_stamp()
         name = self.get_project_name_from_path(project_path)
-        print(f"Opening project: {name} → {project_path}")
-        messagebox.showinfo("Open Project", f"Opening project:\n{name}")
-
+        
+        print(f"Open button for Project {name} clicked --- {stamp}")
+        print(f"Opening Project path: {project_path}")
+        
+        # Initialize a new Window for Project Menu (only once)
+        ProjectWindow(self, name, project_path, status)
+        
 
     def edit_project(self, project_path):
         name = self.get_project_name_from_path(project_path)

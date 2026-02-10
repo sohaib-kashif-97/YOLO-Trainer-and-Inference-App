@@ -1,0 +1,72 @@
+{
+  "CTk": {
+    "fg_color": ["#222C36", "#F3F4F6"],
+    "bg_color": ["#293447", "#E5E7EB"]
+  },
+  "CTkFrame": {
+    "fg_color": ["#293447", "#F3F4F6"],
+    "border_color": ["#374151", "#CBD5E1"],
+    "corner_radius": 16
+  },
+  "CTkButton": {
+    "fg_color": ["#60A5FA", "#38BDF8"],
+    "hover_color": ["#38BDF8", "#60A5FA"],
+    "text_color": ["#F1F5F9", "#222C36"],
+    "corner_radius": 12,
+    "font": ["Segoe UI", 13, "bold"]
+  },
+  "CTkLabel": {
+    "text_color": ["#E0E7EF", "#222C36"],
+    "font": ["Segoe UI", 12]
+  },
+  "CTkEntry": {
+    "fg_color": ["#222C36", "#FFFFFF"],
+    "border_color": ["#60A5FA", "#38BDF8"],
+    "text_color": ["#F1F5F9", "#222C36"],
+    "corner_radius": 10,
+    "font": ["Segoe UI", 12]
+  },
+  "CTkComboBox": {
+    "fg_color": ["#222C36", "#FFFFFF"],
+    "border_color": ["#60A5FA", "#38BDF8"],
+    "text_color": ["#F1F5F9", "#222C36"],
+    "corner_radius": 10,
+    "font": ["Segoe UI", 12]
+  },
+  "CTkCheckBox": {
+    "fg_color": ["#60A5FA", "#38BDF8"],
+    "border_color": ["#293447", "#F3F4F6"],
+    "text_color": ["#E0E7EF", "#222C36"],
+    "font": ["Segoe UI", 12]
+  },
+  "CTkProgressBar": {
+    "fg_color": ["#222C36", "#E5E7EB"],
+    "progress_color": ["#60A5FA", "#38BDF8"],
+    "border_color": ["#374151", "#CBD5E1"]
+  },
+  "CTkTabview": {
+    "fg_color": ["#293447", "#F3F4F6"],
+    "segmented_button_fg_color": ["#222C36", "#E5E7EB"],
+    "segmented_button_selected_color": ["#60A5FA", "#38BDF8"],
+    "segmented_button_unselected_color": ["#293447", "#F3F4F6"],
+    "text_color": ["#E0E7EF", "#222C36"],
+    "font": ["Segoe UI", 13, "bold"]
+  },
+  "CTkSwitch": {
+    "button_color": ["#60A5FA", "#38BDF8"],
+    "fg_color": ["#293447", "#F3F4F6"],
+    "progress_color": ["#60A5FA", "#38BDF8"],
+    "text_color": ["#E0E7EF", "#222C36"],
+    "font": ["Segoe UI", 12]
+  },
+  "CTkSlider": {
+    "fg_color": ["#222C36", "#E5E7EB"],
+    "progress_color": ["#60A5FA", "#38BDF8"],
+    "button_color": ["#38BDF8", "#60A5FA"]
+  },
+  "CTkTextbox": {
+    "fg_color": ["#222C36", "#FFFFFF"],
+    "text_color": ["#E0E7EF", "#222C36"],
+    "font": ["Consolas", 11]
+  }
+} 

@@ -2,8 +2,10 @@ import os
 import re
 import pytz
 import yaml
+import json
 import logging
 import datetime
+from pathlib import Path
 from datetime import date, datetime
 from PIL import Image
 import customtkinter as ctk
@@ -89,6 +91,63 @@ def load_yaml_config(config_path):
     except Exception as e:
         logging.error(f"Error loading config file {config_path}: {e}")
         return {}
+
+def save_projects_in_json(projects, json_file):
+    try:
+        # Sort by idx before saving (optional)
+        sorted_projects = sorted(projects, key=lambda x: x.get('idx', 0))
+        with open(json_file, 'w', encoding='utf-8') as f:
+            json.dump(sorted_projects, f, indent=4)
+    except Exception as e:
+        print(f"Error saving projects.json: {e}")
+
+def load_projects_in_json(json_file, projects):
+        if os.path.exists(json_file):
+            try:
+                with open(json_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                
+                # Filter only projects whose folder still exists
+                valid_projects = []
+                for entry in data:
+                    if isinstance(entry, dict) and 'path' in entry:
+                        if os.path.exists(entry['path']):
+                            valid_projects.append(entry)
+                
+                projects = valid_projects
+                
+                # Re-number indices if you want (optional)
+                for i, proj in enumerate(projects, 1):
+                    proj['idx'] = i
+                
+                if len(valid_projects) != len(data):
+                    save_projects_in_json()   # CHECK: clean up removed projects
+                
+            except Exception as e:
+                print(f"Error loading projects.json: {e}")
+                projects = []
+        else:
+            projects = []
+
+def set_status_in_json(json_file, idx, name, status):
+    """Loads a JSON configuration file and updates its contents."""
+    
+    json_path = Path(json_file)
+    
+    try:
+        with open(json_path, 'r') as file:
+            projects = json.safe_load(file)
+            
+        for project in projects:
+            if project['name'] == name and project['idx'] == idx:
+                project['status'] = status
+        
+        
+        return save_projects_in_json(projects, json_path)
+            
+    except Exception as e:
+        logging.error(f"Error loading config file {json_file}: {e}")
+        return
 
 def get_source_type(filepath):
     """Determines if a file path points to an image or video."""
